@@ -53,6 +53,21 @@ class Customer {
     return new Customer(customer);
   }
 
+  static async search(search) {
+    const results = await db.query(
+      `SELECT id, 
+         first_name AS "firstName",  
+         last_name AS "lastName", 
+         phone, 
+         notes
+       FROM customers
+       WHERE upper(first_name) LIKE '%${search.toUpperCase()}%'
+       OR upper(last_name) LIKE '%${search.toUpperCase()}%'
+       ORDER BY last_name, first_name`
+    );
+    return results.rows.map(c => new Customer(c));
+  }
+
   /** get all reservations for this customer. */
 
   async getReservations() {
@@ -77,6 +92,10 @@ class Customer {
         [this.firstName, this.lastName, this.phone, this.notes, this.id]
       );
     }
+  }
+
+  get fullName() {
+    return `${this.firstName} ${this.lastName}`;
   }
 }
 
